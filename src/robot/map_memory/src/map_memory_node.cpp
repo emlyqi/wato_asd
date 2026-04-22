@@ -1,6 +1,39 @@
+#include <chrono>
+
 #include "map_memory_node.hpp"
 
-MapMemoryNode::MapMemoryNode() : Node("map_memory"), map_memory_(robot::MapMemoryCore(this->get_logger())) {}
+MapMemoryNode::MapMemoryNode() : Node("map_memory"), map_memory_(robot::MapMemoryCore(this->get_logger())) {
+  costmap_sub_ = this->create_subscription<nav_msgs::msg::OccupancyGrid>(
+    "/costmap", 10,
+    std::bind(&MapMemoryNode::costmapCallback, this, std::placeholders::_1)
+  );
+  odom_sub_ = this->create_subscription<nav_msgs::msg::Odometry>(
+    "/odom/filtered", 10,
+    std::bind(&MapMemoryNode::odomCallback, this, std::placeholders::_1)
+  );
+  map_pub_ = this->create_publisher<nav_msgs::msg::OccupancyGrid>("/map", 10);
+  timer_ = this->create_wall_timer(
+    std::chrono::seconds(1),
+    std::bind(&MapMemoryNode::updateMap, this)
+  );
+}
+
+void MapMemoryNode::costmapCallback(const nav_msgs::msg::OccupancyGrid::SharedPtr msg) {
+  map_memory_.updateCostmap(*msg);
+}
+
+void MapMemoryNode::odomCallback(const nav_msgs::msg::Odometry::SharedPtr msg) {
+  map_memory_.updateOdometry(*msg);
+}
+
+void MapMemoryNode::updateMap() {
+  if (!map_memory_.tryMerge()) return;
+
+  auto grid = map_memory_.getGlobalMap();
+  grid.header.stamp = this->get_clock()->now();
+  grid.header.frame_id = "sim_world"; // global frame
+  map_pub_->publish(grid);
+}
 
 int main(int argc, char ** argv)
 {
