@@ -42,7 +42,7 @@ class MapMemoryCore {
     double last_y_ = 0.0;
     bool has_last_ = false;
 
-    double distance_threshold_ = 1.5; // m
+    double distance_threshold_ = 0.3; // m
 
     void mergeLatestCostmap();
 };

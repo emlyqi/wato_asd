@@ -27,12 +27,12 @@ void MapMemoryNode::odomCallback(const nav_msgs::msg::Odometry::SharedPtr msg) {
 }
 
 void MapMemoryNode::updateMap() {
-  if (!map_memory_.tryMerge()) return;
+  map_memory_.tryMerge(); // try but don't care ab return value
 
   auto grid = map_memory_.getGlobalMap();
   grid.header.stamp = this->get_clock()->now();
   grid.header.frame_id = "sim_world"; // global frame
-  map_pub_->publish(grid);
+  map_pub_->publish(grid); // always publish
 }
 
 int main(int argc, char ** argv)
