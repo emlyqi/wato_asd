@@ -4,7 +4,9 @@ End-to-end autonomous navigation stack in C++ / ROS 2 for a simulated differenti
 Built as the [WATonomous ASD Admissions Assignment](./ASSIGNMENT.md).
 
 ## Demo
-INSERT DEMO
+(sped up 5x)
+
+https://github.com/user-attachments/assets/dafb7a27-f421-458e-be2f-24f7da117d24
 
 ## What it does
 Four ROS 2 nodes, each handling one layer of the navigation stack:
